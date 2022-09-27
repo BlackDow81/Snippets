@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from MainApp.models import Snippet
-from MainApp.forms import SnippetForm
+from MainApp.forms import SnippetForm, UserRegistrationForm
 
 
 def index_page(request):
@@ -49,3 +49,15 @@ def login_page(request):
 def logout_page(request):
     auth.logout(request)
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def registration(request):
+    if request.method == "GET":
+        form = UserRegistrationForm()
+        context = {'pagename': 'Регистрация пользователя', "form": form}
+        return render(request, 'pages/registration.html', context)
+    elif request.method == "POST":
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("home")
