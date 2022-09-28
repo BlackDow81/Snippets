@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib import auth
 from MainApp.models import Snippet
 from MainApp.forms import SnippetForm, UserRegistrationForm
+# from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.decorators import login_required
 
 
 def index_page(request):
@@ -10,6 +12,7 @@ def index_page(request):
     return render(request, 'pages/index.html', context)
 
 
+@login_required
 def add_snippet_page(request):
     if request.method == "GET":
         form = SnippetForm()
@@ -18,7 +21,9 @@ def add_snippet_page(request):
     elif request.method == "POST":
         form = SnippetForm(request.POST)
         if form.is_valid():
-            form.save()
+            snippet = form.save(commit=False)
+            snippet.user = request.user
+            snippet.save()
             return redirect("snippets-list")
 
 
